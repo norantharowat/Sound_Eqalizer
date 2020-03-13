@@ -30,7 +30,6 @@ class Example(QMainWindow):
         self.newFreqMagnitude = [[], []]
         self.newFreq= [[], []]
         self.band = [[], []]
-        #self.gains = [[10], [10]]
         self.gains =[[1]*10, [1]*10] 
         self.gain = [1, 1]
         self.scaledMag = [[], []]
@@ -54,31 +53,8 @@ class Example(QMainWindow):
         self.ui.comboBox.currentIndexChanged.connect(self.select_equalizer)
 
 
-    def checked_window(self):
-
-        for i in range(3) :
-            self.windowList[i].clicked.connect(lambda ch , i=i: self.get_window(self.windowList[i].text()))
     
 
-    def get_window(self,EQNumber):
-        if self.ui.comboBox_2.currentText() != "":
-            for scale in range(10) :
-                self.Scales[scale].setEnabled(True) 
-        else:
-            self.ui.graphicsView.clear()
-            self.ui.graphicsView_2.clear()
-            for scale in range(10) :
-                self.Scales[scale].setEnabled(False) 
-        
-        if self.ui.comboBox_2.currentText() == "Rectangular" :
-            self.Equalizer(EQNumber , self.ui.comboBox_2.currentText() )
-            self.slider_changed(EQNumber , self.ui.comboBox_2.currentText() )
-
-
-        elif self.ui.comboBox_2.currentText() == "Hanning" :
-            self.Equalizer(EQNumber , self.ui.comboBox_2.currentText() )
-        elif self.ui.comboBox_2.currentText() == "Hamming" :
-            self.Equalizer(EQNumber , self.ui.comboBox_2.currentText() )
 
 
     def select_equalizer(self):
@@ -113,6 +89,36 @@ class Example(QMainWindow):
                 
             self.ui.comboBox_2.currentIndexChanged.connect(lambda: self.get_window(self.EQNum))
 
+
+    def checked_window(self):
+
+        for i in range(3) :
+            self.windowList[i].clicked.connect(lambda ch , i=i: self.get_window(self.windowList[i].text()))
+
+
+
+    def get_window(self,EQNumber):
+        if self.ui.comboBox_2.currentText() != "":
+            for scale in range(10) :
+                self.Scales[scale].setEnabled(True) 
+        else:
+            self.ui.graphicsView.clear()
+            self.ui.graphicsView_2.clear()
+            for scale in range(10) :
+                self.Scales[scale].setEnabled(False) 
+        
+        if self.ui.comboBox_2.currentText() == "Rectangular" :
+            self.Equalizer(EQNumber , self.ui.comboBox_2.currentText() )
+            self.slider_changed(EQNumber , self.ui.comboBox_2.currentText() )
+
+
+        elif self.ui.comboBox_2.currentText() == "Hanning" :
+            self.Equalizer(EQNumber , self.ui.comboBox_2.currentText() )
+        elif self.ui.comboBox_2.currentText() == "Hamming" :
+            self.Equalizer(EQNumber , self.ui.comboBox_2.currentText() )
+
+
+
     def plotAudio(self):
 
         Audio (str(self.fname[0]))    
@@ -122,7 +128,7 @@ class Example(QMainWindow):
         self.dataSize= self.audio.shape[0]          
         self.totalTime = self.dataSize/ self.rate           
         self.pen = pg.mkPen(color=(255, 0, 0))
-        self.ui.graphicsView.addLegend()
+        #self.ui.graphicsView.addLegend()
         self.time = np.arange(self.dataSize) / self.rate
         self.plotting(self.ui.graphicsView, self.time, self.audio, "sound waveform")
         self.ui.pushButton.clicked.connect(lambda: self.playChoice())
@@ -133,9 +139,11 @@ class Example(QMainWindow):
         self.length = len(self.fourier)
         self.bandwidth = self.length//10
         self.freq = np.fft.rfftfreq(self.dataSize,    d= 1/ self.rate)
-        print (self.length, len(self.fourier))
-        for bandNumber in range(10):
-            self.EQLabels[bandNumber].setText(str(math.ceil(bandNumber * self.bandwidth/100.0)/20.0) + "-" + str(math.ceil(self.bandwidth * (1 + bandNumber)/100.0)/20.0) + " KHZ")
+        print(self.freq)
+
+        for bandNumber in range(9):
+            self.EQLabels[bandNumber].setText(str(self.freq[bandNumber*self.bandwidth]//1000) + "-" + str(self.freq[bandNumber * self.bandwidth + self.bandwidth]//1000) + " KHZ")
+        self.EQLabels[9].setText(str(self.freq[9*self.bandwidth]//1000) + "-" + str(self.freq[-1]//1000) + " KHZ")
         
         for i in range(len(self.fourier)):
             self.dectionary[i] = self.fourier[i]
@@ -168,13 +176,17 @@ class Example(QMainWindow):
         else:
             self.newFreq[EQNum]= copy(self.fourier)
             windowing = self.HamHan(window)
-            bandCentralFreq = self.bandwidth//2 + self.bandwidth * bandNumber
-            if bandNumber== 0:
-                self.newFreq[EQNum][: math.floor(1.5 * self.bandwidth)] *= windowing[len(self.newFreq[EQNum][: math.floor(1.5 * self.bandwidth)])] * self.gain[EQNum]
-            elif bandNumber== 9:
-                self.newFreq[EQNum][bandCentralFreq - self.bandwidth :] *= windowing[: math.floor(1.5*self.bandwidth)]* self.gain[EQNum]
-            else:
-                self.newFreq[EQNum][bandCentralFreq - self.bandwidth : bandCentralFreq + self.bandwidth] *= windowing * self.gain[EQNum]
+            while bandNumber <10 :
+                bandCentralFreq = self.bandwidth//2 + self.bandwidth * bandNumber
+                if bandNumber== 0:
+                    self.newFreq[EQNum][: math.floor(1.5 * self.bandwidth)] *= windowing[len(self.newFreq[EQNum][: math.floor(1.5 * self.bandwidth)])] * self.gain[EQNum]
+                elif bandNumber== 9:
+                    self.newFreq[EQNum][bandCentralFreq - self.bandwidth :] *= windowing[: math.floor(1.5*self.bandwidth)]* self.gain[EQNum]
+                else:
+                    self.newFreq[EQNum][bandCentralFreq - self.bandwidth : bandCentralFreq + self.bandwidth] *= windowing * self.gain[EQNum]
+
+                bandNumber += 1
+
             self.newFreqMagnitude[EQNum]= np.abs(self.newFreq[EQNum])
  
         self.plotting(self.ui.graphicsView_2, self.freq, self.newFreqMagnitude[EQNum], "scaled fourier")
