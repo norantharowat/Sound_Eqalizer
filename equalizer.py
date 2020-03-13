@@ -15,7 +15,7 @@ from IPython.display import Audio
 from popup import Ui_Dialog as Form
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from newguiTest import Ui_MainWindow
+from gui import Ui_MainWindow
 
 class Example(QMainWindow):
 
@@ -28,33 +28,76 @@ class Example(QMainWindow):
         self.Scales = [self.ui.s1,self.ui.s2,self.ui.s3,self.ui.s4,self.ui.s5,self.ui.s6,self.ui.s7,self.ui.s8,self.ui.s9,self.ui.s10]
         self.EQLabels = [self.ui.band1, self.ui.band2,self.ui.band3,self.ui.band4,self.ui.band5,self.ui.band6,self.ui.band7,self.ui.band8,self.ui.band9,self.ui.band10]
         self.newFreqMagnitude = [[], []]
-        self.newFreq= [[], []]
+        self.newFreq= [[],[]]
         self.band = [[], []]
-        self.gains =[[1]*10, [1]*10] 
-        self.gain = [1, 1]
+        self.Save_gains =[[1]*10, [1]*10] 
+        print(self.Save_gains)
+        self.Save_window =  ["",""]
+
         self.scaledMag = [[], []]
         self.bandsDivided = [[],[],[],[],[],[],[],[],[],[]]
         self.scaledMagDicided = [[],[],[],[],[],[],[],[],[],[]]
         self.dectionary = {}
+        self.ui.comboBox_2.currentTextChanged.connect(self.eq_changes)
+        self.ui.comboBox.currentTextChanged.connect(self.eq_changes)
+
 
         self.initUI()
 
     def initUI(self):
 
         self.ui.actionopen.triggered.connect(self.open_audio)
+        self.ui.actionSave_EQ1_2.triggered.connect(lambda: self.Save_EQData(0 , self.ui.comboBox_2.currentText()))
+        self.ui.actionGet_EQ1.triggered.connect(lambda : self.Get_EQData(0 , self.Save_window[0]))
+        self.ui.actionSave_EQ2_2.triggered.connect(lambda: self.Save_EQData(1 , self.ui.comboBox_2.currentText()))
+        self.ui.actionGet_EQ2.triggered.connect(lambda : self.Get_EQData(1 , self.Save_window[1]))
         self.show()
 
-    
+    def Save_EQData(self, EQNUM, Window):
+
+        for i in range(10) :
+            self.Save_gains[EQNUM][i] =  self.Scales[i].value()
+        self.Save_window[EQNUM] = Window
+    def Get_EQData(self, EQNUM, Window ):
+        for i in range(10):
+            self.Scales[i].setValue(self.Save_gains[EQNUM][i])
+
+        self.ui.comboBox_2.setCurrentText(Window)
+        if EQNUM == 0 :
+            self.ui.comboBox.setCurrentText("EQ1")
+        else :
+            self.ui.comboBox.setCurrentText("EQ2")
+
+
+        self.Equalizer(EQNUM, Window )
+
+
+    def label_changes(self,result):
+        if self.ui.comboBox_2.currentText() =="Rectangular" and (self.ui.comboBox.currentText() =="EQ1" or self.ui.comboBox.currentText() == "EQ2"):
+            self.ui.label_2.setText("Rectangular res_"+str(result))
+            self.ui.label_3.setText("Rectangular_fourier res_"+str(result))
+        elif self.ui.comboBox_2.currentText()=="Hanning" and (self.ui.comboBox.currentText() =="EQ1" or self.ui.comboBox.currentText() == "EQ2"):
+            self.ui.label_2.setText("Hanning res_"+str(result))
+            self.ui.label_3.setText("Haning_fourier res_"+str(result))
+        elif self.ui.comboBox_2.currentText()=="Hamming" and (self.ui.comboBox.currentText() =="EQ1" or self.ui.comboBox.currentText() == "EQ2"):
+            self.ui.label_2.setText("Hamming res_"+str(result))
+            self.ui.label_3.setText("Hamming_fourier res_"+str(result))
+        
+    def eq_changes(self):
+        res=0
+        if self.ui.comboBox.currentText() =="EQ1" :
+            res=1
+            self.label_changes(res)
+        elif self.ui.comboBox.currentText() == "EQ2" :
+            res=2
+            self.label_changes(res)            
+
                 
     def open_audio(self):
         
         self.fname = QFileDialog().getOpenFileName(self, 'Open file', '/home',"signals(*.wav )")
         self.select_equalizer()
         self.ui.comboBox.currentIndexChanged.connect(self.select_equalizer)
-
-
-    
-
 
 
     def select_equalizer(self):
@@ -65,6 +108,8 @@ class Example(QMainWindow):
             for scale in range(10) :
                 self.Scales[scale].setEnabled(False)  
             self.ui.comboBox_2.setEnabled(False)
+
+
         elif self.ui.comboBox.currentText() == "EQ1" or "EQ2" :
             self.ui.comboBox_2.setEnabled(True)
             self.ui.label.setEnabled(True)
@@ -83,8 +128,7 @@ class Example(QMainWindow):
             else:
                 
                 self.Equalizer(self.EQNum, self.ui.comboBox_2.currentText())
-                for sliderNum in range(10):
-                    self.Scales[sliderNum].setValue(self.gains[self.EQNum][sliderNum])
+                
                     
                 
             self.ui.comboBox_2.currentIndexChanged.connect(lambda: self.get_window(self.EQNum))
@@ -114,8 +158,11 @@ class Example(QMainWindow):
 
         elif self.ui.comboBox_2.currentText() == "Hanning" :
             self.Equalizer(EQNumber , self.ui.comboBox_2.currentText() )
+            self.slider_changed(EQNumber , self.ui.comboBox_2.currentText() )
+
         elif self.ui.comboBox_2.currentText() == "Hamming" :
             self.Equalizer(EQNumber , self.ui.comboBox_2.currentText() )
+            self.slider_changed(EQNumber , self.ui.comboBox_2.currentText() )
 
 
 
@@ -166,7 +213,7 @@ class Example(QMainWindow):
                     self.band[EQNum] = self.fourier[bandNumber*self.bandwidth : bandNumber*self.bandwidth + (self.bandwidth)]
                     self.bandsDivided[bandNumber] = self.fourier[bandNumber*self.bandwidth : bandNumber*self.bandwidth + (self.bandwidth)]
 
-                bandWindow = self.band[EQNum] * self.gain[EQNum]
+                bandWindow = self.band[EQNum] * self.getGain(EQNum, bandNumber )
                 self.newFreq[EQNum] = np.append(self.newFreq[EQNum], bandWindow)
                 for i in range(10) :
                     self.scaledMagDicided[i] =  np.abs(self.bandsDivided[i])
@@ -179,11 +226,11 @@ class Example(QMainWindow):
             while bandNumber <10 :
                 bandCentralFreq = self.bandwidth//2 + self.bandwidth * bandNumber
                 if bandNumber== 0:
-                    self.newFreq[EQNum][: math.floor(1.5 * self.bandwidth)] *= windowing[len(self.newFreq[EQNum][: math.floor(1.5 * self.bandwidth)])] * self.gain[EQNum]
+                    self.newFreq[EQNum][: math.floor(1.5 * self.bandwidth)] *= windowing[len(self.newFreq[EQNum][: math.floor(1.5 * self.bandwidth)])] * self.getGain(EQNum, bandNumber )
                 elif bandNumber== 9:
-                    self.newFreq[EQNum][bandCentralFreq - self.bandwidth :] *= windowing[: math.floor(1.5*self.bandwidth)]* self.gain[EQNum]
+                    self.newFreq[EQNum][bandCentralFreq - self.bandwidth :] *= windowing[: math.floor(1.5*self.bandwidth)]* self.getGain(EQNum, bandNumber )
                 else:
-                    self.newFreq[EQNum][bandCentralFreq - self.bandwidth : bandCentralFreq + self.bandwidth] *= windowing * self.gain[EQNum]
+                    self.newFreq[EQNum][bandCentralFreq - self.bandwidth : bandCentralFreq + self.bandwidth] *= windowing * self.getGain(EQNum, bandNumber )
 
                 bandNumber += 1
 
@@ -227,22 +274,20 @@ class Example(QMainWindow):
 
 
     def getGain (self, EQNum, bandNumber):
-        
-        self.gain[EQNum] = self.Scales[bandNumber].value()
-        self.gains[EQNum][bandNumber] = self.gain[EQNum]
-        if self.gain[EQNum] < 0:
-            self.gain[EQNum] = -1/self.gain[EQNum]
-        self.Scale(EQNum, self.ui.comboBox_2.currentText(), bandNumber)
-        return self.gains, self.gain
-    
+        gain = self.Scales[bandNumber].value()
+
+        return gain
+
+
     def slider_changed(self, EQ , Window):
         for sliderNum in range(10) :
-            self.Scales[sliderNum].valueChanged.connect(lambda ch, sliderNum=sliderNum: self.getGain(self.EQNum, sliderNum))
+            self.Scales[sliderNum].valueChanged.connect(lambda ch, sliderNum=sliderNum: self.Scale(EQ, Window, sliderNum))
+
 
     def Scale(self,EQNumber, window, bandNumber):
         scaledbandfft = [[],[],[],[],[],[],[],[],[],[]]
         if window == "Rectangular":
-            scaledbandfft[bandNumber] = self.bandsDivided[bandNumber] * self.gain[EQNumber]
+            scaledbandfft[bandNumber] = self.bandsDivided[bandNumber] * self.getGain(EQNumber, bandNumber)
             j = 0 
 
 
@@ -255,27 +300,30 @@ class Example(QMainWindow):
                 for i in range(bandNumber*self.bandwidth , bandNumber*self.bandwidth + (self.bandwidth)) :
                     self.dectionary[i] = scaledbandfft[bandNumber][j]
                     j = j + 1 
+
+            totalScaled = list()
+
+            for key in self.dectionary.keys():
+                totalScaled.append(self.dectionary[key])
+            
+            self.totalMag = abs(np.array(totalScaled))
+
+            self.plotting(self.ui.graphicsView_2, self.freq, self.totalMag, "scaled fourier")    
+            self.showIFFT(self.ui.graphicsView , EQNumber , totalScaled , self.totalMag )
                 
+
         else:
             self.Equalizer(EQNumber, window)
 
-        totalScaled = list()
 
-        for key in self.dectionary.keys():
-            totalScaled.append(self.dectionary[key])
-        
-        self.totalMag = abs(np.array(totalScaled))
-        self.ui.pushButton_3.setEnabled(True)
-        self.plotting(self.ui.graphicsView_2, self.freq, self.totalMag, "scaled fourier")    
-        self.showIFFT(self.ui.graphicsView , EQNumber , totalScaled , self.totalMag)
+
     
-
 
     def HamHan(self, window):
         if window == "hanning":
             windowing = np.hanning(self.bandwidth*2)
         else:
-            windowing = signal.hamming(self.bandwidth*2)
+            windowing = np.hamming(self.bandwidth*2)
         return windowing
 
 

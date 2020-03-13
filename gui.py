@@ -2,16 +2,18 @@
 
 # Form implementation generated from reading ui file 'newguiTest.ui'
 #
-# Created by: PyQt5 UI code generator 5.11.3
+# Created by: PyQt5 UI code generator 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(757, 481)
+        MainWindow.resize(831, 481)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
@@ -95,14 +97,6 @@ class Ui_MainWindow(object):
         self.gridLayout.addLayout(self.horizontalLayout_10, 0, 0, 1, 1)
         self.gridLayout_7 = QtWidgets.QGridLayout()
         self.gridLayout_7.setObjectName("gridLayout_7")
-        self.graphicsView = PlotWidget(self.centralwidget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.graphicsView.sizePolicy().hasHeightForWidth())
-        self.graphicsView.setSizePolicy(sizePolicy)
-        self.graphicsView.setObjectName("graphicsView")
-        self.gridLayout_7.addWidget(self.graphicsView, 0, 0, 1, 1)
         self.gridLayout_6 = QtWidgets.QGridLayout()
         self.gridLayout_6.setObjectName("gridLayout_6")
         self.s10 = QtWidgets.QSlider(self.centralwidget)
@@ -348,7 +342,7 @@ class Ui_MainWindow(object):
         self.band10.setAlignment(QtCore.Qt.AlignCenter)
         self.band10.setObjectName("band10")
         self.gridLayout_6.addWidget(self.band10, 1, 9, 1, 1)
-        self.gridLayout_7.addLayout(self.gridLayout_6, 2, 0, 1, 1)
+        self.gridLayout_7.addLayout(self.gridLayout_6, 4, 0, 1, 1)
         self.graphicsView_2 = PlotWidget(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
@@ -356,14 +350,30 @@ class Ui_MainWindow(object):
         sizePolicy.setHeightForWidth(self.graphicsView_2.sizePolicy().hasHeightForWidth())
         self.graphicsView_2.setSizePolicy(sizePolicy)
         self.graphicsView_2.setObjectName("graphicsView_2")
-        self.gridLayout_7.addWidget(self.graphicsView_2, 1, 0, 1, 1)
+        self.gridLayout_7.addWidget(self.graphicsView_2, 3, 0, 1, 1)
+        self.graphicsView = PlotWidget(self.centralwidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.graphicsView.sizePolicy().hasHeightForWidth())
+        self.graphicsView.setSizePolicy(sizePolicy)
+        self.graphicsView.setObjectName("graphicsView")
+        self.gridLayout_7.addWidget(self.graphicsView, 1, 0, 1, 1)
+        self.label_2 = QtWidgets.QLabel(self.centralwidget)
+        self.label_2.setObjectName("label_2")
+        self.gridLayout_7.addWidget(self.label_2, 0, 0, 1, 1)
+        self.label_3 = QtWidgets.QLabel(self.centralwidget)
+        self.label_3.setObjectName("label_3")
+        self.gridLayout_7.addWidget(self.label_3, 2, 0, 1, 1)
         self.gridLayout.addLayout(self.gridLayout_7, 1, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 757, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 831, 26))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
+        self.menuResults = QtWidgets.QMenu(self.menubar)
+        self.menuResults.setObjectName("menuResults")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
@@ -378,13 +388,26 @@ class Ui_MainWindow(object):
         self.SaveEdit.setObjectName("SaveEdit")
         self.actionSave_Difference = QtWidgets.QAction(MainWindow)
         self.actionSave_Difference.setObjectName("actionSave_Difference")
+        self.actionSave_EQ1_2 = QtWidgets.QAction(MainWindow)
+        self.actionSave_EQ1_2.setObjectName("actionSave_EQ1_2")
+        self.actionGet_EQ1 = QtWidgets.QAction(MainWindow)
+        self.actionGet_EQ1.setObjectName("actionGet_EQ1")
+        self.actionSave_EQ2_2 = QtWidgets.QAction(MainWindow)
+        self.actionSave_EQ2_2.setObjectName("actionSave_EQ2_2")
+        self.actionGet_EQ2 = QtWidgets.QAction(MainWindow)
+        self.actionGet_EQ2.setObjectName("actionGet_EQ2")
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionopen)
         self.menuFile.addAction(self.actionSave_EQ1)
         self.menuFile.addAction(self.actionSave_EQ2)
         self.menuFile.addAction(self.SaveEdit)
         self.menuFile.addAction(self.actionSave_Difference)
+        self.menuResults.addAction(self.actionSave_EQ1_2)
+        self.menuResults.addAction(self.actionGet_EQ1)
+        self.menuResults.addAction(self.actionSave_EQ2_2)
+        self.menuResults.addAction(self.actionGet_EQ2)
         self.menubar.addAction(self.menuFile.menuAction())
+        self.menubar.addAction(self.menuResults.menuAction())
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -400,7 +423,10 @@ class Ui_MainWindow(object):
         self.comboBox_2.setItemText(2, _translate("MainWindow", "Hamming"))
         self.comboBox_2.setItemText(3, _translate("MainWindow", "Hanning"))
         self.pushButton_3.setText(_translate("MainWindow", "Difference"))
+        self.label_2.setText(_translate("MainWindow", "Original"))
+        self.label_3.setText(_translate("MainWindow", "Fourier"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
+        self.menuResults.setTitle(_translate("MainWindow", "Results"))
         self.actionopen.setText(_translate("MainWindow", "Open"))
         self.actionopen.setShortcut(_translate("MainWindow", "Ctrl+O"))
         self.actionSave_EQ1.setText(_translate("MainWindow", "Save EQ1"))
@@ -408,8 +434,12 @@ class Ui_MainWindow(object):
         self.actionSave_EQ2.setText(_translate("MainWindow", "Save EQ2"))
         self.SaveEdit.setText(_translate("MainWindow", "Save Edit "))
         self.actionSave_Difference.setText(_translate("MainWindow", "Save Difference "))
-
+        self.actionSave_EQ1_2.setText(_translate("MainWindow", "Save EQ1 data"))
+        self.actionGet_EQ1.setText(_translate("MainWindow", "Get EQ1 data"))
+        self.actionSave_EQ2_2.setText(_translate("MainWindow", "Save EQ2 data"))
+        self.actionGet_EQ2.setText(_translate("MainWindow", "Get EQ2 data"))
 from pyqtgraph import PlotWidget
+
 
 if __name__ == "__main__":
     import sys
@@ -419,4 +449,3 @@ if __name__ == "__main__":
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
-
