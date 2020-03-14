@@ -27,9 +27,9 @@ class Example(QMainWindow):
         self.time = []
         self.Scales = [self.ui.s1,self.ui.s2,self.ui.s3,self.ui.s4,self.ui.s5,self.ui.s6,self.ui.s7,self.ui.s8,self.ui.s9,self.ui.s10]
         self.EQLabels = [self.ui.band1, self.ui.band2,self.ui.band3,self.ui.band4,self.ui.band5,self.ui.band6,self.ui.band7,self.ui.band8,self.ui.band9,self.ui.band10]
-        self.newFreqMagnitude = [[], []]
-        self.newFreq= [[],[]]
-        self.band = [[], []]
+        self.newFreqMagnitude = []
+        self.newFreq= []
+        self.band = []
         self.Save_gains =[[1]*10, [1]*10] 
         print(self.Save_gains)
         self.Save_window =  ["",""]
@@ -69,35 +69,54 @@ class Example(QMainWindow):
             self.ui.comboBox.setCurrentText("EQ2")
 
 
-        self.Equalizer(EQNUM, Window )
+        self.Equalizer(Window )
 
 
     def label_changes(self,result):
-        if self.ui.comboBox_2.currentText() =="Rectangular" and (self.ui.comboBox.currentText() =="EQ1" or self.ui.comboBox.currentText() == "EQ2"):
+        if str(self.ui.comboBox_2.currentText()) =="Rectangular" and (str(self.ui.comboBox.currentText() =="EQ1") or str(self.ui.comboBox.currentText()) == "EQ2"):
             self.ui.label_2.setText("Rectangular res_"+str(result))
             self.ui.label_3.setText("Rectangular_fourier res_"+str(result))
-        elif self.ui.comboBox_2.currentText()=="Hanning" and (self.ui.comboBox.currentText() =="EQ1" or self.ui.comboBox.currentText() == "EQ2"):
+        elif str(self.ui.comboBox_2.currentText())=="Hanning" and (str(self.ui.comboBox.currentText()) =="EQ1" or str(self.ui.comboBox.currentText()) == "EQ2"):
             self.ui.label_2.setText("Hanning res_"+str(result))
             self.ui.label_3.setText("Haning_fourier res_"+str(result))
-        elif self.ui.comboBox_2.currentText()=="Hamming" and (self.ui.comboBox.currentText() =="EQ1" or self.ui.comboBox.currentText() == "EQ2"):
+        elif str(self.ui.comboBox_2.currentText())=="Hamming" and (str(self.ui.comboBox.currentText()) =="EQ1" or str(self.ui.comboBox.currentText()) == "EQ2"):
             self.ui.label_2.setText("Hamming res_"+str(result))
             self.ui.label_3.setText("Hamming_fourier res_"+str(result))
         
     def eq_changes(self):
         res=0
-        if self.ui.comboBox.currentText() =="EQ1" :
+        if str(self.ui.comboBox.currentText()) =="EQ1" :
             res=1
             self.label_changes(res)
-        elif self.ui.comboBox.currentText() == "EQ2" :
+        elif str(self.ui.comboBox.currentText()) == "EQ2" :
             res=2
-            self.label_changes(res)            
+            self.label_changes(res)   
+        elif str(self.ui.comboBox.currentText()) == "Original":
+             self.ui.label_2.setText("Original")
+             self.ui.label_3.setText("Fourier")       
 
                 
     def open_audio(self):
+
+        
         
         self.fname = QFileDialog().getOpenFileName(self, 'Open file', '/home',"signals(*.wav )")
-        self.select_equalizer()
-        self.ui.comboBox.currentIndexChanged.connect(self.select_equalizer)
+        
+
+        if self.fname[0]!='':
+            self.ui.comboBox.setCurrentText("Original")
+            self.ui.comboBox_2.setCurrentText("")
+            self.ui.comboBox_2.setDisabled(True)
+            self.select_equalizer()
+            self.ui.pushButton_3.clicked.connect(lambda: self.showDifference(self.audio, self.timeWaveReal, abs(self.fourier), self.newFreqMagnitude))            
+
+            self.ui.comboBox.currentIndexChanged.connect(self.select_equalizer)
+
+        else:
+            pass
+
+
+        
 
 
     def select_equalizer(self):
@@ -113,31 +132,30 @@ class Example(QMainWindow):
         elif self.ui.comboBox.currentText() == "EQ1" or "EQ2" :
             self.ui.comboBox_2.setEnabled(True)
             self.ui.label.setEnabled(True)
+            self.ui.pushButton_3.setDisabled(False)
             
-            self.ui.pushButton_3.clicked.connect(lambda: self.showDifference(self.audio, self.timeWaveReal, abs(self.fourier), self.totalMag))            
             if self.ui.comboBox.currentText() == "EQ1":
                 self.EQNum = 0
+                
+
                 
             else :
                 
                 self.EQNum = 1
+
 
             if self.ui.comboBox_2.currentText() == "":
                 self.ui.graphicsView.clear()
                 self.ui.graphicsView_2.clear()
             else:
                 
-                self.Equalizer(self.EQNum, self.ui.comboBox_2.currentText())
+                self.Equalizer(self.ui.comboBox_2.currentText())
                 
                     
                 
             self.ui.comboBox_2.currentIndexChanged.connect(lambda: self.get_window(self.EQNum))
 
 
-    def checked_window(self):
-
-        for i in range(3) :
-            self.windowList[i].clicked.connect(lambda ch , i=i: self.get_window(self.windowList[i].text()))
 
 
 
@@ -152,17 +170,19 @@ class Example(QMainWindow):
                 self.Scales[scale].setEnabled(False) 
         
         if self.ui.comboBox_2.currentText() == "Rectangular" :
-            self.Equalizer(EQNumber , self.ui.comboBox_2.currentText() )
-            self.slider_changed(EQNumber , self.ui.comboBox_2.currentText() )
+            self.Equalizer(self.ui.comboBox_2.currentText() )
+            self.slider_changed(self.ui.comboBox_2.currentText() )
+
 
 
         elif self.ui.comboBox_2.currentText() == "Hanning" :
-            self.Equalizer(EQNumber , self.ui.comboBox_2.currentText() )
-            self.slider_changed(EQNumber , self.ui.comboBox_2.currentText() )
+            self.Equalizer( self.ui.comboBox_2.currentText() )
+            self.slider_changed(self.ui.comboBox_2.currentText() )
+
 
         elif self.ui.comboBox_2.currentText() == "Hamming" :
-            self.Equalizer(EQNumber , self.ui.comboBox_2.currentText() )
-            self.slider_changed(EQNumber , self.ui.comboBox_2.currentText() )
+            self.Equalizer(self.ui.comboBox_2.currentText() )
+            self.slider_changed(self.ui.comboBox_2.currentText() )
 
 
 
@@ -175,7 +195,6 @@ class Example(QMainWindow):
         self.dataSize= self.audio.shape[0]          
         self.totalTime = self.dataSize/ self.rate           
         self.pen = pg.mkPen(color=(255, 0, 0))
-        #self.ui.graphicsView.addLegend()
         self.time = np.arange(self.dataSize) / self.rate
         self.plotting(self.ui.graphicsView, self.time, self.audio, "sound waveform")
         self.ui.pushButton.clicked.connect(lambda: self.playChoice())
@@ -198,47 +217,47 @@ class Example(QMainWindow):
         self.plotting(self.ui.graphicsView_2, self.freq, abs(self.fourier), "fourier")
 
 
-    def Equalizer(self ,EQNum, window):
+    def Equalizer(self , window):
         bandNumber=0
         
         if window == "Rectangular":
-            self.newFreq[EQNum] = []
-            self.band[EQNum] = []
+            self.newFreq= []
+            self.band = []
             while bandNumber<10 :
                 if bandNumber == 9:
-                    self.band[EQNum] = self.fourier[bandNumber*self.bandwidth : ] 
+                    self.band = self.fourier[bandNumber*self.bandwidth : ] 
                     self.bandsDivided[bandNumber] = self.fourier[bandNumber*self.bandwidth : ] 
 
                 else:
-                    self.band[EQNum] = self.fourier[bandNumber*self.bandwidth : bandNumber*self.bandwidth + (self.bandwidth)]
+                    self.band = self.fourier[bandNumber*self.bandwidth : bandNumber*self.bandwidth + (self.bandwidth)]
                     self.bandsDivided[bandNumber] = self.fourier[bandNumber*self.bandwidth : bandNumber*self.bandwidth + (self.bandwidth)]
 
-                bandWindow = self.band[EQNum] * self.getGain(EQNum, bandNumber )
-                self.newFreq[EQNum] = np.append(self.newFreq[EQNum], bandWindow)
+                bandWindow = self.band * self.getGain( bandNumber )
+                self.newFreq = np.append(self.newFreq, bandWindow)
                 for i in range(10) :
                     self.scaledMagDicided[i] =  np.abs(self.bandsDivided[i])
                 bandNumber += 1
-            self.newFreqMagnitude[EQNum] = np.abs(self.newFreq[EQNum])
+            self.newFreqMagnitude = np.abs(self.newFreq)
         
         else:
-            self.newFreq[EQNum]= copy(self.fourier)
+            self.newFreq= copy(self.fourier)
             windowing = self.HamHan(window)
             while bandNumber <10 :
                 bandCentralFreq = self.bandwidth//2 + self.bandwidth * bandNumber
                 if bandNumber== 0:
-                    self.newFreq[EQNum][: math.floor(1.5 * self.bandwidth)] *= windowing[len(self.newFreq[EQNum][: math.floor(1.5 * self.bandwidth)])] * self.getGain(EQNum, bandNumber )
+                    self.newFreq[: math.floor(1.5 * self.bandwidth)] *= windowing[len(self.newFreq[: math.floor(1.5 * self.bandwidth)])] * self.getGain( bandNumber )
                 elif bandNumber== 9:
-                    self.newFreq[EQNum][bandCentralFreq - self.bandwidth :] *= windowing[: math.floor(1.5*self.bandwidth)]* self.getGain(EQNum, bandNumber )
+                    self.newFreq[bandCentralFreq - self.bandwidth :] *= windowing[: math.floor(1.5*self.bandwidth)]* self.getGain( bandNumber )
                 else:
-                    self.newFreq[EQNum][bandCentralFreq - self.bandwidth : bandCentralFreq + self.bandwidth] *= windowing * self.getGain(EQNum, bandNumber )
+                    self.newFreq[bandCentralFreq - self.bandwidth : bandCentralFreq + self.bandwidth] *= windowing * self.getGain( bandNumber )
 
                 bandNumber += 1
 
-            self.newFreqMagnitude[EQNum]= np.abs(self.newFreq[EQNum])
+            self.newFreqMagnitude= np.abs(self.newFreq)
  
-        self.plotting(self.ui.graphicsView_2, self.freq, self.newFreqMagnitude[EQNum], "scaled fourier")
+        self.plotting(self.ui.graphicsView_2, self.freq, self.newFreqMagnitude, "scaled fourier")
         
-        self.showIFFT(self.ui.graphicsView, EQNum , self.newFreq[EQNum] , self.newFreqMagnitude[EQNum])
+        self.showIFFT(self.ui.graphicsView , self.newFreq , self.newFreqMagnitude)
 
         
                 
@@ -248,7 +267,7 @@ class Example(QMainWindow):
         obj.plot(x, y, name = Name, pen= self.pen)
 
             
-    def showIFFT(self , IFFTplot, EQNum , fftData, totalMag):
+    def showIFFT(self , IFFTplot  , fftData, totalMag):
         timeWave = np.fft.irfft(fftData , n = len(self.audio))
         self.timeWaveReal = np.real(timeWave)
         self.plotting(IFFTplot, self.time, self.timeWaveReal, "sound with EQ")
@@ -273,21 +292,21 @@ class Example(QMainWindow):
         dialog.show()
 
 
-    def getGain (self, EQNum, bandNumber):
+    def getGain (self, bandNumber):
         gain = self.Scales[bandNumber].value()
 
         return gain
 
 
-    def slider_changed(self, EQ , Window):
+    def slider_changed(self , Window):
         for sliderNum in range(10) :
-            self.Scales[sliderNum].valueChanged.connect(lambda ch, sliderNum=sliderNum: self.Scale(EQ, Window, sliderNum))
+            self.Scales[sliderNum].valueChanged.connect(lambda ch, sliderNum=sliderNum: self.Scale( Window, sliderNum))
 
 
-    def Scale(self,EQNumber, window, bandNumber):
+    def Scale(self, window, bandNumber):
         scaledbandfft = [[],[],[],[],[],[],[],[],[],[]]
         if window == "Rectangular":
-            scaledbandfft[bandNumber] = self.bandsDivided[bandNumber] * self.getGain(EQNumber, bandNumber)
+            scaledbandfft[bandNumber] = self.bandsDivided[bandNumber] * self.getGain( bandNumber)
             j = 0 
 
 
@@ -307,13 +326,17 @@ class Example(QMainWindow):
                 totalScaled.append(self.dectionary[key])
             
             self.totalMag = abs(np.array(totalScaled))
+            self.newFreqMagnitude = copy(self.totalMag)
 
             self.plotting(self.ui.graphicsView_2, self.freq, self.totalMag, "scaled fourier")    
-            self.showIFFT(self.ui.graphicsView , EQNumber , totalScaled , self.totalMag )
+            self.showIFFT(self.ui.graphicsView , totalScaled , self.totalMag )
                 
 
         else:
-            self.Equalizer(EQNumber, window)
+            self.Equalizer( window)
+
+        #self.ui.pushButton_3.setEnabled(True)
+
 
 
 
