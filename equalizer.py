@@ -273,6 +273,7 @@ class Example(QMainWindow):
         self.plotting(IFFTplot, self.time, self.timeWaveReal, "sound with EQ")
         
         self.ui.actionSave_EQ1.triggered.connect(lambda: self.Save_audio(str(self.fname[0])))
+        self.ui.actionSave_EQ2.triggered.connect(lambda: self.Save_audioEQ2(str(self.fname[0])))
         
     def Save_audio(self, name):
         wavio.write( name[:-4] + "Equalized_version.wav", self.timeWaveReal, self.rate, sampwidth = 2)
@@ -352,25 +353,36 @@ class Example(QMainWindow):
 
     def playChoice(self):
         if self.ui.comboBox.currentText() == "Original":
-            self.play(self.audio, self.rate, self.ui.pushButton_2, self.ui.pushButton)
+            self.play(self.audio, self.rate, self.ui.pushButton_2, self.ui.pushButton )
         else:
             self.play(self.timeWaveReal, self.rate, self.ui.pushButton_2, self.ui.pushButton)
             
     def play(self, Audio,rate , pushButton, playButton):
         Audio *= 32767 / np.max(np.abs(Audio))
         Audio = Audio.astype(np.int16)
-        
+
         self.play_obj = sa.play_buffer(Audio, 1, 2, rate)
-        
+        playButton.setEnabled(False)
+
         if self.play_obj.is_playing() :
             playButton.setEnabled(False)
             QtCore.QTimer.singleShot(self.totalTime *1000, lambda: playButton.setDisabled(False))
-
+    
+        print(self.play_obj)
         pushButton.clicked.connect(lambda: self.stop(playButton))
+      
+        
+
 
         
     def stop(self,playButton ):
-        self.play_obj.stop()
+        # self.play_obj.stop()
+        sa.stop_all()
+        
+
+        
+
+        
         playButton.setDisabled(False)
 
 

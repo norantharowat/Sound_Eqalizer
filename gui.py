@@ -400,8 +400,6 @@ class Ui_MainWindow(object):
         self.menuFile.addAction(self.actionopen)
         self.menuFile.addAction(self.actionSave_EQ1)
         self.menuFile.addAction(self.actionSave_EQ2)
-        self.menuFile.addAction(self.SaveEdit)
-        self.menuFile.addAction(self.actionSave_Difference)
         self.menuResults.addAction(self.actionSave_EQ1_2)
         self.menuResults.addAction(self.actionGet_EQ1)
         self.menuResults.addAction(self.actionSave_EQ2_2)
