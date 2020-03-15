@@ -247,9 +247,9 @@ class Example(QMainWindow):
                 if bandNumber== 0:
                     self.newFreq[: math.floor(1.5 * self.bandwidth)] *= windowing[len(self.newFreq[: math.floor(1.5 * self.bandwidth)])] * self.getGain( bandNumber )
                 elif bandNumber== 9:
-                    self.newFreq[bandCentralFreq - self.bandwidth :] *= windowing[: math.floor(1.5*self.bandwidth)]* self.getGain( bandNumber )
+                    self.newFreq[bandCentralFreq - self.bandwidth :] *= windowing[:len(self.newFreq[bandCentralFreq - self.bandwidth :] )]* self.getGain( bandNumber )
                 else:
-                    self.newFreq[bandCentralFreq - self.bandwidth : bandCentralFreq + self.bandwidth] *= windowing * self.getGain( bandNumber )
+                    self.newFreq[bandCentralFreq - self.bandwidth : bandCentralFreq + self.bandwidth] *= windowing[len(windowing) - len(self.newFreq[bandCentralFreq - self.bandwidth : bandCentralFreq + self.bandwidth]):] * self.getGain( bandNumber )
 
                 bandNumber += 1
 
@@ -295,6 +295,10 @@ class Example(QMainWindow):
 
     def getGain (self, bandNumber):
         gain = self.Scales[bandNumber].value()
+
+        if gain < 0:
+            gain = -1/gain
+
 
         return gain
 
