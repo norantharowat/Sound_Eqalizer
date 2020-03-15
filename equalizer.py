@@ -134,6 +134,9 @@ class Example(QMainWindow):
             self.ui.label.setEnabled(True)
             self.ui.pushButton_3.setDisabled(False)
             
+            for scale in range(10) :
+                self.Scales[scale].setEnabled(True)  
+            
             if self.ui.comboBox.currentText() == "EQ1":
                 self.EQNum = 0
                 
